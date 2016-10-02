@@ -5,6 +5,7 @@ module.exports = function() {
     var cssDir = assetsDir + 'css/';
     var buildDir = './build/';
     var tempDir = './.tmp/';
+    var root = './';
 
     var config = {
         /**
@@ -13,11 +14,12 @@ module.exports = function() {
         
         appDir: appDir,
         buildDir: buildDir,
-        buildAssetsDir: buildDir + 'assets/',
+        buildAssetsDir: buildDir + 'src/assets/',
         //the folder to put the compiled css
         cssDir: cssDir,
         css: cssDir + 'styles.css',
         fonts: './bower_components/font-awesome/fonts/**/*.*',
+        html: appDir + '**/*.html',
         htmltemplates: appDir + '**/*.html',
         images: assetsDir + 'images/**/*.*',
         index: 'index.html',
@@ -28,8 +30,19 @@ module.exports = function() {
             '!' + appDir + '**/*.spec.js'
         ],
         less: assetsDir + 'styles/styles.less',
+        root: root,
         serverDir: serverDir,
         tempDir: tempDir,
+
+        /**
+         * optimized files
+         */
+        optimized: {
+            css: 'src/assets/css/*.css',
+            jsLib: 'src/assets/js/*.js',
+            jsApp: 'src/app/*.js',
+            all: '!index.html'
+        },
 
         /**
          * template cache
@@ -50,6 +63,10 @@ module.exports = function() {
             json: require('./bower.json'),
             directory: './bower_components/'
         },
+        packages: [
+            './package.json',
+            './bower.json'
+        ],
 
         /**
          * Node settings

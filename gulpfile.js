@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var args = require('yargs').argv;
 var browserSync = require('browser-sync');
 var config = require('./gulp.config')();
 var del = require('del');
@@ -52,7 +53,7 @@ gulp.task('clean-code', function() {
     var files = [].concat(
         config.tempDir + '**/*.js',
         config.buildDir + '**/*.html',
-        config.buildDir + 'js/**/*.js'
+        config.buildDir + '**/*.js'
     );
     clean(files);
 });
@@ -83,7 +84,7 @@ gulp.task('wiredep', function() {
         .src(config.index)
         .pipe(wiredep(options))
         .pipe($.inject(gulp.src(config.js)))
-        .pipe(gulp.dest('./'));
+        .pipe(gulp.dest(config.root));
 });
 
 gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
@@ -96,10 +97,9 @@ gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
 
 });
 
-gulp.task('optimize', ['inject'], function() {
+gulp.task('optimize', ['inject', 'fonts', 'images'], function() {
     log('Optimizing the javascript, css, html');
 
-    // var assets = $.useref.assets({searchPath: './'});
     var templateCache = config.tempDir + config.templateCache.file;
 
     return gulp
@@ -108,13 +108,58 @@ gulp.task('optimize', ['inject'], function() {
         .pipe($.inject(gulp.src(templateCache, {read: false}), {
             starttag: '<!-- inject:templates:js -->'
         }))
-        .pipe($.useref())
+        .pipe($.useref({ searchPath: './'}))
+        .pipe($.if(config.optimized.css, $.csso()))
+        .pipe($.if(config.optimized.jsLib, $.uglify()))
+        .pipe($.if(config.optimized.jsApp, $.ngAnnotate({add: true})))
+        .pipe($.if(config.optimized.jsApp, $.uglify()))
+        .pipe($.if(config.optimized.all, $.rev()))
+        .pipe($.revReplace())
+        .pipe(gulp.dest(config.buildDir))
+        .pipe($.rev.manifest())
         .pipe(gulp.dest(config.buildDir));
 });
 
+/**
+ * Bump the version
+ * --type=pre will bump the prerelease version *.*.*-x
+ * --type=patch or no flag will bump the patch version *.*.x
+ * --type=minor will bump the minor version *.x.*
+ * --type=major will bump the major version x.*.*
+ * --version=1.2.3 will bump to a specific version and ignore other flags
+ */
+gulp.task('bump', function() {
+    var msg = 'Bumping versions';
+    var type = args.type;
+    var version = args.version;
+    var options = {};
+
+    if (version) {
+        options.version = version;
+        msg += ' to ' + version;
+    } else {
+        options.type = type;
+        msg += ' for a ' + type;
+    }
+    log(msg);
+    return gulp
+        .src(config.packages)
+        .pipe($.bump(options))
+        .pipe(gulp.dest(config.root));
+});
+
 //node server
+gulp.task('serve-build', ['optimize'], function() {
+    serve(false /* isDev */);
+});
+
 gulp.task('serve-dev', ['inject'], function() {
-    var isDev = true;
+    serve(true /* isDev */);
+})
+
+//////////
+
+function serve(isDev) {
 
     var nodeOptions = {
         script: config.nodeServer,
@@ -137,7 +182,7 @@ gulp.task('serve-dev', ['inject'], function() {
         })
         .on('start', function() {
             log('*** nodemon started');
-            startBrowserSync();
+            startBrowserSync(isDev);
         })
         .on('crash', function() {
             log('*** nodemon crashed: script crashed for some reason');
@@ -145,15 +190,13 @@ gulp.task('serve-dev', ['inject'], function() {
         .on('exit', function() {
             log('*** nodemon exited cleanly');
         });
-})
-
-//////////
+}
 
 function changeEvent(event) {
     log('File ' + event.path + ' ' + event.type);
 }
 
-function startBrowserSync() {
+function startBrowserSync(isDev) {
     if (browserSync.active) {
         log('BrowserSync already active');
         return;
@@ -161,18 +204,23 @@ function startBrowserSync() {
 
     log('Starting browser-sync on port ' + port);
 
-    gulp.watch([config.less], ['styles'])
-        .on('change', function(ev) { changeEvent(ev); });
+    if (isDev) {
+        gulp.watch([config.less], ['styles'])
+            .on('change', function(ev) { changeEvent(ev); });
+    } else {
+        gulp.watch([config.less, config.js, config.html], ['optimize', browserSync.reload])
+            .on('change', function(ev) { changeEvent(ev); });
+    }
 
     var options = {
         proxy: 'localhost:' + port,
         port: 3000,
-        files: [
+        files: isDev ? [
             config.appDir + '**/*.*',
             '!' + config.less,
             config.cssDir + '**/*.css',
             config.index
-        ],
+        ] : [],
         ghostMode: {
             clicks: true,
             location: false,
