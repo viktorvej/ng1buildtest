@@ -4,7 +4,8 @@ var browserSync = require('browser-sync');
 var config = require('./gulp.config')();
 var del = require('del');
 var $ = require('gulp-load-plugins')({lazy: true});
-var port = process.env.PORT || config.defaultPort;
+var port = process.env.PORT || config.defaultPort
+var runSequence = require('run-sequence');
 
 gulp.task('styles', ['clean-styles'], function() {
     log('Compiling Less --> CSS');
@@ -34,19 +35,19 @@ gulp.task('images', ['clean-images'], function() {
 gulp.task('clean', function() {
     var delconfig = [].concat(config.buildDir, config.cssDir, config.tempDir);
     log('Cleaning: ' + $.util.colors.blue(delconfig));
-    del(delconfig);
+    return del(delconfig);
 });
 
 gulp.task('clean-fonts', function() {
-    clean(config.buildAssetsDir + 'fonts/**/*.*');
+    return clean(config.buildAssetsDir + 'fonts/**/*.*');
 });
 
 gulp.task('clean-images', function() {
-    clean(config.buildAssetsDir + 'images/**/*.*');
+    return clean(config.buildAssetsDir + 'images/**/*.*');
 });
 
 gulp.task('clean-styles', function() {
-    clean(config.cssDir + '**/*.css');
+    return clean(config.cssDir + '**/*.css');
 });
 
 gulp.task('clean-code', function() {
@@ -55,7 +56,7 @@ gulp.task('clean-code', function() {
         config.buildDir + '**/*.html',
         config.buildDir + '**/*.js'
     );
-    clean(files);
+    return clean(files);
 });
 
 gulp.task('less-watcher', function() {
@@ -149,8 +150,10 @@ gulp.task('bump', function() {
 });
 
 //node server
-gulp.task('serve-build', ['optimize'], function() {
-    serve(false /* isDev */);
+gulp.task('serve-build', function() {
+    runSequence('clean', 'optimize', function() {
+        serve(false /* isDev */);
+    });
 });
 
 gulp.task('serve-dev', ['inject'], function() {
@@ -240,7 +243,7 @@ function startBrowserSync(isDev) {
 
 function clean(path) {
     log('Cleaning: ' + $.util.colors.blue(path));
-    del(path);
+    return del(path);
 }
 
 function log(msg) {
