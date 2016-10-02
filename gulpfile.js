@@ -31,7 +31,7 @@ gulp.task('images', ['clean-images'], function() {
 });
 
 gulp.task('clean', function() {
-    var delconfig = [].concat(config.buildDir, config.cssDir);
+    var delconfig = [].concat(config.buildDir, config.cssDir, config.tempDir);
     log('Cleaning: ' + $.util.colors.blue(delconfig));
     del(delconfig);
 });
