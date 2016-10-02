@@ -12,8 +12,8 @@ obj
 node_modules
 bower_components
 build
-#/src/assets/css
-#/.tmp
+/src/assets/css
+/.tmp
 
 # Ignore Test reporters
 ###################
