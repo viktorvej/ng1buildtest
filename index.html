@@ -12,15 +12,19 @@
         .ng-hide { display: none!important; }
     </style>
 
+    <!-- build:css assets/css/lib.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="bower_components/toastr/toastr.css" />
     <!-- endbower -->
+    <!-- endbuild -->
 
+    <!-- build:css assets/css/app.css -->
     <!-- inject:css -->
     <link rel="stylesheet" href="/src/assets/css/styles.css">
     <!-- endinject -->
+    <!-- endbuild -->
 
 </head>
 <body>
@@ -38,6 +42,7 @@
         </div>
     </div>
 
+    <!-- build:js assets/js/lib.js -->
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
@@ -49,35 +54,42 @@
     <script src="bower_components/toastr/toastr.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <!-- endbower -->
+    <!-- endbuild -->
 
+    <!-- build:js assets/js/app.js -->
     <!-- inject:js -->
     <script src="/src/app/app.module.js"></script>
     <script src="/src/app/core/core.module.js"></script>
-    <script src="/src/app/dashboard/dashboard.module.js"></script>
     <script src="/src/app/customers/customers.module.js"></script>
-    <script src="/src/app/layout/layout.module.js"></script>
+    <script src="/src/app/dashboard/dashboard.module.js"></script>
     <script src="/src/app/widgets/widgets.module.js"></script>
+    <script src="/src/app/layout/layout.module.js"></script>
     <script src="/src/app/blocks/exception/exception.module.js"></script>
     <script src="/src/app/blocks/logger/logger.module.js"></script>
     <script src="/src/app/blocks/router/router.module.js"></script>
     <script src="/src/app/core/config.js"></script>
     <script src="/src/app/core/constants.js"></script>
     <script src="/src/app/core/dataservice.js"></script>
-    <script src="/src/app/dashboard/dashboard.controller.js"></script>
-    <script src="/src/app/dashboard/dashboard.route.js"></script>
     <script src="/src/app/customers/customer-detail.controller.js"></script>
     <script src="/src/app/customers/customers.controller.js"></script>
     <script src="/src/app/customers/customers.route.js"></script>
+    <script src="/src/app/dashboard/dashboard.controller.js"></script>
+    <script src="/src/app/dashboard/dashboard.route.js"></script>
+    <script src="/src/app/widgets/ht-img-person.directive.js"></script>
+    <script src="/src/app/widgets/ht-widget-header.directive.js"></script>
     <script src="/src/app/layout/ht-sidebar.directive.js"></script>
     <script src="/src/app/layout/ht-top-nav.directive.js"></script>
     <script src="/src/app/layout/shell.controller.js"></script>
     <script src="/src/app/layout/sidebar.controller.js"></script>
-    <script src="/src/app/widgets/ht-img-person.directive.js"></script>
-    <script src="/src/app/widgets/ht-widget-header.directive.js"></script>
     <script src="/src/app/blocks/exception/exception-handler.provider.js"></script>
     <script src="/src/app/blocks/exception/exception.js"></script>
     <script src="/src/app/blocks/logger/logger.js"></script>
     <script src="/src/app/blocks/router/router-helper.provider.js"></script>
     <!-- endinject -->
+
+    <!-- inject:templates:js -->
+    <!-- endinject -->
+
+    <!-- endbuild -->
 </body>
 </html>

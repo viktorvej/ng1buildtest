@@ -16,13 +16,62 @@ gulp.task('styles', ['clean-styles'], function() {
         .pipe(gulp.dest(config.cssDir));
 });
 
+gulp.task('fonts', ['clean-fonts'], function() {
+    log('Copying fonts');
+
+    return gulp.src(config.fonts)
+        .pipe(gulp.dest(config.buildAssetsDir + 'fonts'));
+});
+
+gulp.task('images', ['clean-images'], function() {
+    log('Copying images');
+
+    return gulp.src(config.images)
+        .pipe(gulp.dest(config.buildAssetsDir + 'images'));
+});
+
+gulp.task('clean', function() {
+    var delconfig = [].concat(config.buildDir, config.cssDir);
+    log('Cleaning: ' + $.util.colors.blue(delconfig));
+    del(delconfig);
+});
+
+gulp.task('clean-fonts', function() {
+    clean(config.buildAssetsDir + 'fonts/**/*.*');
+});
+
+gulp.task('clean-images', function() {
+    clean(config.buildAssetsDir + 'images/**/*.*');
+});
+
 gulp.task('clean-styles', function() {
-    var files = config.cssDir + '**/*.css';
+    clean(config.cssDir + '**/*.css');
+});
+
+gulp.task('clean-code', function() {
+    var files = [].concat(
+        config.tempDir + '**/*.js',
+        config.buildDir + '**/*.html',
+        config.buildDir + 'js/**/*.js'
+    );
     clean(files);
 });
 
 gulp.task('less-watcher', function() {
     gulp.watch([config.less], ['styles']);
+});
+
+gulp.task('templatecache', ['clean-code'], function() {
+    log('Creating AngularJS $templateCache');
+
+    return gulp
+        .src(config.htmltemplates)
+        .pipe($.minifyHtml({empty: true}))
+        .pipe($.angularTemplatecache(
+            config.templateCache.file,
+            config.templateCache.options
+            ))
+        .pipe(gulp.dest(config.tempDir));
 });
 
 gulp.task('wiredep', function() {
@@ -34,16 +83,33 @@ gulp.task('wiredep', function() {
         .src(config.index)
         .pipe(wiredep(options))
         .pipe($.inject(gulp.src(config.js)))
-        .pipe(gulp.dest(''));
+        .pipe(gulp.dest('./'));
 });
 
-gulp.task('inject', ['wiredep', 'styles'], function() {
-    log('');
+gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
+    log('Injecting stuff to the index.html');
 
     return gulp
         .src(config.index)
         .pipe($.inject(gulp.src(config.css)))
         .pipe(gulp.dest(''));
+
+});
+
+gulp.task('optimize', ['inject'], function() {
+    log('Optimizing the javascript, css, html');
+
+    // var assets = $.useref.assets({searchPath: './'});
+    var templateCache = config.tempDir + config.templateCache.file;
+
+    return gulp
+        .src(config.index)
+        .pipe($.plumber())
+        .pipe($.inject(gulp.src(templateCache, {read: false}), {
+            starttag: '<!-- inject:templates:js -->'
+        }))
+        .pipe($.useref())
+        .pipe(gulp.dest(config.buildDir));
 });
 
 //node server

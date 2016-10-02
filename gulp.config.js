@@ -3,34 +3,45 @@ module.exports = function() {
     var appDir = './src/app/';
     var serverDir = './server/';
     var cssDir = assetsDir + 'css/';
+    var buildDir = './build/';
+    var tempDir = './.tmp/';
 
     var config = {
         /**
          * File paths
          */
         
-        //the app folder
         appDir: appDir,
-
+        buildDir: buildDir,
+        buildAssetsDir: buildDir + 'assets/',
         //the folder to put the compiled css
         cssDir: cssDir,
-
-        //the css file
         css: cssDir + 'styles.css',
-
-        //the less file to compile
-        less: assetsDir + 'styles/styles.less',
-
-        //the dev index html-file
+        fonts: './bower_components/font-awesome/fonts/**/*.*',
+        htmltemplates: appDir + '**/*.html',
+        images: assetsDir + 'images/**/*.*',
         index: 'index.html',
-        
         //all the app js-files
         js: [
             appDir + '**/*.module.js',
             appDir + '**/*.js',
             '!' + appDir + '**/*.spec.js'
         ],
+        less: assetsDir + 'styles/styles.less',
         serverDir: serverDir,
+        tempDir: tempDir,
+
+        /**
+         * template cache
+         */
+        templateCache: {
+            file: 'templates.js',
+            options: {
+                module: 'app.core',
+                standAlone: false,
+                root: 'src/app/'
+            }
+        },
 
         /**
          * Bower and NPM locations
