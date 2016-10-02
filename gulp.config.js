@@ -1,12 +1,16 @@
 module.exports = function() {
-    var assets = './src/assets/';
-    var app = './src/app/'
-    var cssDir = assets + 'css/';
+    var assetsDir = './src/assets/';
+    var appDir = './src/app/';
+    var serverDir = './server/';
+    var cssDir = assetsDir + 'css/';
 
     var config = {
         /**
          * File paths
          */
+        
+        //the app folder
+        appDir: appDir,
 
         //the folder to put the compiled css
         cssDir: cssDir,
@@ -15,17 +19,18 @@ module.exports = function() {
         css: cssDir + 'styles.css',
 
         //the less file to compile
-        less: assets + 'styles/styles.less',
+        less: assetsDir + 'styles/styles.less',
 
         //the dev index html-file
         index: 'index.html',
         
         //all the app js-files
         js: [
-            app + '**/*.module.js',
-            app + '**/*.js',
-            '!' + app + '**/*.spec.js'
+            appDir + '**/*.module.js',
+            appDir + '**/*.js',
+            '!' + appDir + '**/*.spec.js'
         ],
+        serverDir: serverDir,
 
         /**
          * Bower and NPM locations
@@ -33,7 +38,19 @@ module.exports = function() {
         bower: {
             json: require('./bower.json'),
             directory: './bower_components/'
-        }
+        },
+
+        /**
+         * Node settings
+         */
+        defaultPort: 7203,
+        nodeServer: serverDir + 'app.js',
+
+        /**
+         * browser sync
+         */
+
+        browserReloadDelay: 1000,
     };
 
     config.getWiredepDefaultOptions = function() {
